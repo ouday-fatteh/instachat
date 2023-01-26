@@ -14,7 +14,7 @@ const Navbar = ({ user }) => {
         <div className='h-12 items-center flex px-12 w-full justify-between bg-slate-700'>
             <img src={Logo} className='h-8' alt="Instachat" />
             <div className='flex gap-8 text-white items-center'>
-                <span>{user?.displayName || 'user name'}</span>
+                <span>{user?.displayName}</span>
                 <div className='h-8 w-8 rounded-full bg-white cursor-pointer relative' onClick={handleDropdown}>
                     {isOpen && (
                         <div className='absolute text-black right-0 top-10 w-48 bg-white border rounded-lg flex flex-col py-2'>

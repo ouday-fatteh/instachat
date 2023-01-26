@@ -7,8 +7,10 @@ const Auth = () => {
     const location = useLocation()
     const params = new URLSearchParams(location.search)
     const type = params.get('authtype');
+
     if (type === 'signup') return <Signup />
     else return <Signin />;
+
 }
 
 export default Auth
