@@ -6,7 +6,16 @@ import {
   signOut,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  collection,
+  query,
+  where,
+} from "firebase/firestore";
 import { handleError } from "./errorhandlers";
 
 const firebaseConfig = {
@@ -151,6 +160,53 @@ const sendPasswordReset = async (email) => {
     return "No user was found with this email.";
   }
 };
+
+const sendMessage = async (senderId, recipientId, content) => {
+  try {
+    const messageRef = doc(collection(db, "messages"));
+
+    await setDoc(messageRef, {
+      senderId,
+      recipientId,
+      content,
+      timestamp: Date.now(),
+    }).then(() => console.log("success"));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getMessages = async (ownId, friendId) => {
+  const messages = [];
+  try {
+    console.log(ownId, friendId);
+    const myMessagestoFriend = query(
+      collection(db, "messages"),
+      where("senderId", "==", ownId),
+      where("recipientId", "==", friendId)
+    );
+    const friendMessagetoMe = query(
+      collection(db, "messages"),
+      where("senderId", "==", friendId),
+      where("recipientId", "==", ownId)
+    );
+
+    const querySnapshot = await getDocs(myMessagestoFriend);
+    const querySnapshotT = await getDocs(friendMessagetoMe);
+
+    querySnapshot.forEach((doc) => {
+      messages.push(doc.data());
+    });
+    querySnapshotT.forEach((doc) => {
+      messages.push(doc.data());
+    });
+    messages.sort((a, b) => a.timestamp - b.timestamp);
+    return messages;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const logout = () => {
   signOut(auth);
 };
@@ -164,5 +220,7 @@ export {
   getUserById,
   addFriend,
   getFriends,
+  sendMessage,
+  getMessages,
   logout,
 };

@@ -37,7 +37,7 @@ const Mainchat = ({ user }) => {
                 </div>
             </div>
 
-            <Conversation Id={conversationId && conversationId} />
+            <Conversation Id={conversationId && conversationId} ownId={user?.uid} />
         </div>
     )
 }
