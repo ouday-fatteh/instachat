@@ -54,6 +54,95 @@ const getAuthUser = async (uid) => {
   }
 };
 
+const getUserById = async (uid) => {
+  try {
+    const usersRef = doc(db, "/users", uid);
+    const res = await getDoc(usersRef);
+    return res.data();
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+async function addFriend(userId, friendId) {
+  if (userId !== friendId) {
+    const userRef = doc(db, "/users", userId);
+    const userDoc = await getDoc(userRef);
+
+    const friendRef = doc(db, "/users", friendId);
+    const friendDoc = await getDoc(friendRef);
+    // If the user's document does not exist, return an error
+    if (!userDoc.exists || !friendDoc.exists) {
+      throw new Error(`User with ID ${userId} does not exist`);
+    }
+
+    const friendsList = userDoc.data().friends;
+    const data = userDoc.data();
+
+    const friendsListFriend = friendDoc.data().friends;
+    const dataTwo = friendDoc.data();
+
+    if (!friendsList) {
+      const { authProvider, displayName, email, uid } = data;
+      await setDoc(doc(db, "users", userId), {
+        authProvider,
+        displayName,
+        email,
+        friends: [friendId],
+        uid,
+      })
+        .then(() => console.log("success"))
+        .catch((err) => console.log(err));
+    } else {
+      const { authProvider, displayName, email, uid } = data;
+      friendsList.push(friendId);
+      await setDoc(doc(db, "users", userId), {
+        authProvider,
+        displayName,
+        email,
+        friends: friendsList,
+        uid,
+      })
+        .then(() => console.log("success"))
+        .catch((err) => console.log(err));
+    }
+
+    if (!friendsListFriend) {
+      const { authProvider, displayName, email, uid } = dataTwo;
+      await setDoc(doc(db, "users", friendId), {
+        authProvider,
+        displayName,
+        email,
+        friends: [userId],
+        uid,
+      })
+        .then(() => console.log("success"))
+        .catch((err) => console.log(err));
+    } else {
+      const { authProvider, displayName, email, uid } = dataTwo;
+      friendsListFriend.push(userId);
+      await setDoc(doc(db, "users", friendId), {
+        authProvider,
+        displayName,
+        email,
+        friends: friendsListFriend,
+        uid,
+      })
+        .then(() => console.log("success"))
+        .catch((err) => console.log(err));
+    }
+  } else return { message: "Error same person" };
+}
+
+async function getFriends(uid) {
+  const userRef = doc(db, "/users", uid);
+  const userDoc = await getDoc(userRef);
+  if (!userDoc.exists) {
+    throw new Error(`User with ID ${uid} does not exist`);
+  }
+  return userDoc.data().friends;
+}
+
 const sendPasswordReset = async (email) => {
   try {
     await sendPasswordResetEmail(auth, email);
@@ -72,5 +161,8 @@ export {
   registerWithEmailAndPassword,
   sendPasswordReset,
   getAuthUser,
+  getUserById,
+  addFriend,
+  getFriends,
   logout,
 };

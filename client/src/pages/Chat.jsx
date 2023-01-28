@@ -8,7 +8,6 @@ import { AiOutlineLoading } from 'react-icons/ai';
 const Chat = () => {
     const [user] = useAuthState(auth);
     const [userData, setUserData] = useState();
-
     useEffect(() => {
         const fetchData = async () => {
             const data = await getAuthUser(user.uid);
@@ -28,7 +27,7 @@ const Chat = () => {
         return (
             <div className='flex flex-col h-[100vh] w-full'>
                 <Navbar user={userData} />
-                <Mainchat />
+                <Mainchat user={user} />
             </div>
         )
     }
