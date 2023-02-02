@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Auth, Home, Chat } from "./pages";
+import { Auth, Home, Chat, Invitation } from "./pages";
 import { ProtectedRoute, SignedRoute } from "./components";
 
 function App() {
@@ -31,6 +31,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path={"/invitation"} element={<Invitation />} />
         </Routes>
       </BrowserRouter>
     </div>

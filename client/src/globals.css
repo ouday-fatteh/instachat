@@ -1,0 +1,24 @@
+.main-chat__wrapper {
+  width: 100%;
+  height: calc(100vh - 48px);
+  display: flex;
+  padding: 0rem 10rem;
+}
+.main-chat__friends--main {
+  width: 33%;
+  max-height: 100%;
+}
+.conversation__main--wrapper {
+  width: 66%;
+  height: 100%;
+  overflow: hidden;
+}
+.conversation__chat--area {
+  height: calc(100% - 144px);
+  padding: 2rem 2rem;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: scroll;
+}

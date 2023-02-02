@@ -179,7 +179,6 @@ const sendMessage = async (senderId, recipientId, content) => {
 const getMessages = async (ownId, friendId) => {
   const messages = [];
   try {
-    console.log(ownId, friendId);
     const myMessagestoFriend = query(
       collection(db, "messages"),
       where("senderId", "==", ownId),

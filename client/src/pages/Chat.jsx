@@ -25,7 +25,7 @@ const Chat = () => {
     }
     else {
         return (
-            <div className='flex flex-col h-[100vh] w-full'>
+            <div className='flex flex-col w-full'>
                 <Navbar user={userData} />
                 <Mainchat user={user} />
             </div>

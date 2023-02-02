@@ -1,30 +1,63 @@
-import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
-import dotenv from "dotenv";
-import userRoute from "./routes/user.js";
-
-dotenv.config();
-
-const corsOptions = {
-  origin: "http://localhost:3000",
-  credentials: true, //access-control-allow-credentials:true
-  optionSuccessStatus: 200,
-};
-
-const PORT = process.env.PORT || 5000;
+const express = require("express");
 const app = express();
+const PORT = 8000;
 
-app.use(cors(corsOptions));
-app.use(bodyParser.json({ limit: "30mb", extended: true }));
-app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+//New imports
+const http = require("http").Server(app);
+const cors = require("cors");
 
-app.use("/api", userRoute);
+app.use(cors());
+let users = [];
 
-try {
-  app.listen(PORT, () =>
-    console.log(`Server initialized successfully on port ${PORT}`)
-  );
-} catch (error) {
-  console.log(error);
+const socketIO = require("socket.io")(http, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+  autoConnect: false,
+});
+
+function addUser(data, socketID) {
+  let user = {
+    socketID: socketID,
+    userID: data,
+  };
+  for (let i = users.length - 1; (i = 0); i--) {
+    if (users[i].userID === data) users.slice(i, 1);
+  }
+  users.push(user);
 }
+
+//Add this before the app.get() block
+socketIO.on("connection", (socket) => {
+  console.log(`⚡: ${socket.id} user just connected!`);
+  socket.on("message", (data) => {
+    socketIO.emit("messageResponse", data);
+  });
+  socket.on("newUser", (data) => {
+    //Adds the new user to the list of users
+    addUser(data, socket.id);
+    // console.log(users);
+    //Sends the list of users to the client
+    socketIO.emit("newUserResponse", users);
+    console.log(users);
+  });
+  socket.on("disconnect", () => {
+    console.log("🔥: A user disconnected");
+    //Updates the list of users when a user disconnects from the server
+    users = users.filter((user) => user.socketID !== socket.id);
+    console.log(users);
+    //Sends the list of users to the client
+    socketIO.emit("newUserResponse", users);
+    socket.disconnect();
+  });
+});
+
+app.get("/api", (req, res) => {
+  res.json({
+    message: "Hello world",
+  });
+});
+
+http.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
+});
